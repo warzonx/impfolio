@@ -1,0 +1,18 @@
+
+Package: ipmfolio
+Type: Package
+Title: Solving Maximum-Return Portfolios Using a Barrier Interior-Point Algorithm
+Version: 0.1.0
+Authors@R: c(
+    person(
+      "Nathan", "ELiel",
+      email = "Nathan.eliel@yahoo.fr",
+      role = c("aut", "cre")
+    )
+  )
+Description: Pure R implementation of the core algorithm (no heavy external
+    solvers required for the basic version).
+License: Proprietary
+Encoding: UTF-8
+LazyData: true
+

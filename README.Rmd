@@ -1,0 +1,218 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit README.Rmd -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# ipmfolio
+
+**Portfolio Optimization Using a Barrier Interior-Point Algorithm**
+
+`ipmfolio` is an R package implementing a portfolio optimization algorithm based on the **Interior-Point Method (IPM)**.
+
+The package uses a logarithmic barrier function and Newton's method to solve constrained portfolio optimization problems without relying on external optimization solvers.
+
+The main objective is to determine optimal portfolio weights while respecting investment constraints.
+
+## Mathematical formulation
+
+The package considers a long-only portfolio, meaning that short selling is not allowed.
+
+The portfolio weights must satisfy:
+
+\[
+\sum_{i=1}^{n}x_i=1
+\]
+
+\[
+x_i>0,\quad i=1,\ldots,n
+\]
+
+where:
+
+- \(x_i\) represents the proportion of capital invested in asset \(i\).
+- \(n\) represents the number of assets.
+- \(\mu_i\) represents the expected return of asset \(i\).
+
+### 1. Return maximization
+
+When only expected returns are supplied, the algorithm considers:
+
+\[
+\max_x \quad \mu^T x
+\]
+
+subject to the portfolio constraints.
+
+### 2. Risk-adjusted portfolio optimization
+
+When a covariance matrix is supplied, the objective becomes:
+
+\[
+\max_x \quad \mu^T x-\lambda x^T\Sigma x
+\]
+
+where:
+
+- \(\mu\) is the vector of expected asset returns.
+- \(\Sigma\) is the covariance matrix of asset returns.
+- \(\lambda\) controls the importance assigned to portfolio risk.
+
+## Optimization algorithm
+
+The package implements a logarithmic barrier interior-point approach.
+
+The algorithm progressively approaches the constrained optimum by introducing a barrier term into the objective function.
+
+The barrier formulation is:
+
+\[
+\max_x \quad
+\mu^T x-\lambda x^T\Sigma x
++\tau\sum_{i=1}^{n}\log(x_i)
+\]
+
+subject to:
+
+\[
+\sum_{i=1}^{n}x_i=1
+\]
+
+where \(\tau\) is the barrier parameter.
+
+As the barrier parameter decreases, the solution approaches the optimum of the original constrained problem.
+
+The optimization process relies on:
+
+- Logarithmic barrier functions.
+- Newton's method.
+- Karush-Kuhn-Tucker (KKT) conditions.
+- Iterative updates of the optimization variables.
+- A numerical convergence tolerance.
+
+## Installation
+
+The package is currently under development.
+
+To install the package from a local source directory:
+
+```r
+devtools::install(".")
+```
+
+## Usage
+
+### 1. Basic portfolio optimization
+
+The simplest use case requires only a vector of expected returns.
+
+```{r basic-example}
+library(ipmfolio)
+
+# Expected returns of three assets
+mu <- c(0.10, 0.05, 0.07)
+
+# Run the optimization algorithm
+result <- ipm_portfolio(mu)
+
+# Display optimal portfolio weights
+result$weights
+
+# Display expected portfolio return
+result$expected_return
+```
+
+### 2. Risk-adjusted portfolio optimization
+
+A covariance matrix can also be supplied to account for portfolio risk.
+
+```{r risk-example}
+# Expected returns
+mu <- c(0.10, 0.05, 0.07)
+
+# Covariance matrix
+cov <- matrix(
+  c(
+    0.040, 0.006, 0.008,
+    0.006, 0.025, 0.004,
+    0.008, 0.004, 0.030
+  ),
+  nrow = 3,
+  byrow = TRUE
+)
+
+# Optimize the portfolio
+result <- ipm_portfolio(
+  mu = mu,
+  cov = cov,
+  lambda = 1
+)
+
+# Optimal weights
+result$weights
+
+# Expected return
+result$expected_return
+
+# Portfolio variance
+result$variance
+```
+
+## Algorithm parameters
+
+The main function `ipm_portfolio()` provides several parameters for controlling the optimization process.
+
+| Parameter | Description |
+|---|---|
+| `mu` | Expected returns vector |
+| `cov` | Optional covariance matrix |
+| `lambda` | Risk-aversion coefficient |
+| `x0` | Initial portfolio weights |
+| `barrier_start` | Initial barrier parameter |
+| `barrier_final` | Final barrier parameter |
+| `reduction_factor` | Barrier parameter reduction factor |
+| `max_iter` | Maximum number of iterations |
+| `tol` | Numerical convergence tolerance |
+| `verbose` | Enables or disables iteration output |
+
+## Output
+
+The optimization function returns a list containing the main results:
+
+- `weights`: optimal portfolio allocation.
+- `expected_return`: expected portfolio return.
+- `variance`: portfolio variance when a covariance matrix is supplied.
+- `iterations`: number of iterations performed.
+
+## Project objectives
+
+The primary objective of `ipmfolio` is to provide a transparent implementation of an interior-point optimization algorithm using base R numerical operations.
+
+The project focuses on:
+
+- Understanding the mathematical foundations of constrained optimization.
+- Implementing barrier methods without relying on heavy external solvers.
+- Applying Newton's method to solve the resulting optimization problem.
+- Exploring portfolio allocation through numerical optimization.
+
+## Technologies
+
+- **Language:** R
+- **Optimization approach:** Barrier Interior-Point Method
+- **Numerical method:** Newton's Method
+- **Optimality conditions:** KKT Conditions
+
+## License
+
+Proprietary software — EBN Corporation.
+
+
